@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import * as athena from 'aws-cdk-lib/aws-athena';
+import { aws_lakeformation as lakeformation } from 'aws-cdk-lib';
 
 export class TaskStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -16,9 +17,6 @@ export class TaskStack extends Stack {
         const IAMUser = new iam.CfnUser(this, 'IAMUser', {
           path: "/",
           userName: "SensitiveReader",
-          //groups: [
-            //  "Task_Data_Lake_task3"
-          //],
           managedPolicyArns: [
               "arn:aws:iam::aws:policy/AmazonS3FullAccess",
               "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
@@ -39,6 +37,10 @@ export class TaskStack extends Stack {
               }
           }
       });
+
+      const columnWildcardProperty: lakeformation.CfnPermissions.ColumnWildcardProperty = {
+        excludedColumnNames: ['1,2,3,4'],
+      };
   }
 }
 
