@@ -4,15 +4,8 @@ import { aws_iam as iam } from 'aws-cdk-lib';
 import { aws_codecommit as codecommit } from 'aws-cdk-lib';
 import { aws_athena as athena } from 'aws-cdk-lib';
 import { aws_lakeformation as lakeformation } from 'aws-cdk-lib';
-import * as cdk from "aws-cdk-lib";
 import { Bucket, BucketEncryption, BucketPolicy, IBucket } from "aws-cdk-lib/aws-s3";
-import { AnyPrincipal, Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
-import {App, Fn, Tags} from 'aws-cdk-lib';
-//import * as glue from 'aws-cdk-lib/aws-glue';
-import { CfnDatabase } from 'aws-cdk-lib/aws-glue'
 import { aws_glue as glue } from 'aws-cdk-lib';
-import { aws_memorydb as memorydb } from 'aws-cdk-lib';
-import { CfnUser } from 'aws-cdk-lib/aws-memorydb';
 
 export class TaskStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -58,18 +51,36 @@ export class TaskStack extends Stack {
           }
       });
 
-        //creating database
-        const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
-          catalogId: '363434358349',
-          databaseInput: {
-            createTableDefaultPermissions: [{
-              permissions: ['DATA_LOCATION_ACCESS'],
-              principal: {
-                dataLakePrincipalIdentifier: IAMUser.attrArn,
-              },
-            }],
-            name: "database_cdk_test"
-        }});
+      //creating database
+      const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
+        catalogId: '363434358349',
+        databaseInput: {
+          //createTableDefaultPermissions: [{
+            //permissions: ['DATA_LOCATION_ACCESS'],
+            //principal: {
+              //dataLakePrincipalIdentifier: IAMUser.attrArn,
+            //},
+          //}],
+          name: "database_cdk_test"
+      }});
+
+      //creating permission
+      const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
+        dataLakePrincipal: {
+          dataLakePrincipalIdentifier: IAMUser.attrArn,
+        },
+        resource: {
+          tableWithColumnsResource: {
+            catalogId: '363434358349',
+            columnNames: ['1','2','3','4','5','6','7','8','9','10','11'],
+            columnWildcard: {
+              excludedColumnNames: ['5','6','7','8','9','10','11'],
+           },
+            databaseName: 'database_cdk_test',
+            name: 'table_cdk_test',
+          },
+        },
+      });
 
         //creating table
         const GlueTable = new glue.CfnTable(this, 'GlueTable', {
@@ -149,34 +160,12 @@ export class TaskStack extends Stack {
           }
       });
 
-      //creating permission
-      const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
-        dataLakePrincipal: {
-          dataLakePrincipalIdentifier: IAMUser.attrArn,
-        },
-        resource: {
-          tableWithColumnsResource: {
-            catalogId: '363434358349',
-            columnNames: ['1,2,3,4,5,6,7,8,9,10,11'],
-            columnWildcard: {
-              excludedColumnNames: ['5,6,7,8,9,10,11'],
-           },
-            databaseName: 'database_cdk_test',
-            name: 'table_cdk_test',
-          },
-        },
-      });
-
         //creating query
         const cfnNamedQuery = new athena.CfnNamedQuery(this, 'MyCfnNamedQuery', {
           database: 'database_cdk_test',
           queryString: 'SELECT * FROM "database_cdk_test"."table_cdk_test" limit 3;',
           workGroup: 'AthenaWorkGroup45',
       });
-
-        //const columnWildcardProperty: lakeformation.CfnPermissions.ColumnWildcardProperty = {
-        //excludedColumnNames: ['1,2,3,4'],
-      //};
   }
  //Creating a bucket for access logs
   private createServerAccessLogsBucket = (): IBucket => {
