@@ -11,6 +11,8 @@ import {App, Fn, Tags} from 'aws-cdk-lib';
 //import * as glue from 'aws-cdk-lib/aws-glue';
 import { CfnDatabase } from 'aws-cdk-lib/aws-glue'
 import { aws_glue as glue } from 'aws-cdk-lib';
+import { aws_memorydb as memorydb } from 'aws-cdk-lib';
+import { CfnUser } from 'aws-cdk-lib/aws-memorydb';
 
 export class TaskStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -28,7 +30,8 @@ export class TaskStack extends Stack {
           managedPolicyArns: [
               "arn:aws:iam::aws:policy/AmazonS3FullAccess",
               "arn:aws:iam::aws:policy/AmazonAthenaFullAccess",
-              "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
+              "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess",
+              "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
           ]
         });
 
@@ -50,6 +53,7 @@ export class TaskStack extends Stack {
               requesterPaysEnabled: false,
               resultConfiguration: {
                   outputLocation: "s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
+                  //s3Bucket.bucketArn
               }
           }
       });
@@ -58,12 +62,12 @@ export class TaskStack extends Stack {
         const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
           catalogId: '363434358349',
           databaseInput: {
-            //createTableDefaultPermissions: [{
-              //permissions: ['permissions'],
-              //principal: {
-                //dataLakePrincipalIdentifier: 'dataLakePrincipalIdentifier',
-              //},
-            //}],
+            createTableDefaultPermissions: [{
+              permissions: ['DATA_LOCATION_ACCESS'],
+              principal: {
+                dataLakePrincipalIdentifier: IAMUser.attrArn,
+              },
+            }],
             name: "database_cdk_test"
         }});
 
@@ -148,15 +152,15 @@ export class TaskStack extends Stack {
       //creating permission
       const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
         dataLakePrincipal: {
-          dataLakePrincipalIdentifier: '363434358349',
+          dataLakePrincipalIdentifier: IAMUser.attrArn,
         },
         resource: {
           tableWithColumnsResource: {
             catalogId: '363434358349',
             columnNames: ['1,2,3,4,5,6,7,8,9,10,11'],
             columnWildcard: {
-              excludedColumnNames: ['4,5,6,7,8,9,10,11'],
-            },
+              excludedColumnNames: ['5,6,7,8,9,10,11'],
+           },
             databaseName: 'database_cdk_test',
             name: 'table_cdk_test',
           },
