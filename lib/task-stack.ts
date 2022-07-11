@@ -47,6 +47,7 @@ export class TaskStack extends Stack {
               resultConfiguration: {
                   outputLocation: "s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
                   //s3Bucket.bucketArn
+                  //"s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
               }
           }
       });
@@ -77,6 +78,7 @@ export class TaskStack extends Stack {
               excludedColumnNames: ['5','6','7','8','9','10','11'],
            },
             databaseName: 'database_cdk_test',
+            //Refer to resource CfnDatabase
             name: 'table_cdk_test',
           },
         },
@@ -141,7 +143,9 @@ export class TaskStack extends Stack {
                           type: "string"
                       }
                   ],
-                  location: "s3://taskstack-s3bucket07682993-1bat6tlfqn85w/folder_task3/",
+                  location: s3Bucket.bucketArn,
+                  //s3Bucket.bucketArn
+                  //"s3://taskstack-s3bucket07682993-1bat6tlfqn85w/folder_task3/"
                   inputFormat: "org.apache.hadoop.mapred.TextInputFormat",
                   outputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
                   compressed: false,
