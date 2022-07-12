@@ -45,7 +45,7 @@ export class TaskStack extends Stack {
               publishCloudWatchMetricsEnabled: true,
               requesterPaysEnabled: false,
               resultConfiguration: {
-                  outputLocation: "s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
+                  outputLocation: `s3://${s3Bucket.bucketArn}/`
                   //s3Bucket.bucketArn
                   //"s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
               }
@@ -161,6 +161,7 @@ export class TaskStack extends Stack {
               },
               retention: 0,
               name: "table_cdk_test"
+              //Refer to resource
           }
       });
 
