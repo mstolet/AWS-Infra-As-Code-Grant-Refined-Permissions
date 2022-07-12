@@ -32,7 +32,6 @@ export class TaskStack extends Stack {
         const s3Bucket = new Bucket(this, 'S3Bucket', {
           encryption: BucketEncryption.S3_MANAGED,
           versioned: true,
-          serverAccessLogsBucket: this.createServerAccessLogsBucket(),
         });
         
         //Creates an Athena workgroup
@@ -45,7 +44,7 @@ export class TaskStack extends Stack {
               publishCloudWatchMetricsEnabled: true,
               requesterPaysEnabled: false,
               resultConfiguration: {
-                  outputLocation: `s3://${s3Bucket.bucketArn}/`
+                  outputLocation: "s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
                }
           }
       });
