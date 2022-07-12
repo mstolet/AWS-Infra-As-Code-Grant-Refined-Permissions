@@ -46,22 +46,14 @@ export class TaskStack extends Stack {
               requesterPaysEnabled: false,
               resultConfiguration: {
                   outputLocation: `s3://${s3Bucket.bucketArn}/`
-                  //s3Bucket.bucketArn
-                  //"s3://taskstack-s3bucket07682993-1bat6tlfqn85w/"
-              }
+               }
           }
       });
 
       //creating database
       const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
-        catalogId: '363434358349',
+        catalogId: Stack.of(this).account,
         databaseInput: {
-          //createTableDefaultPermissions: [{
-            //permissions: ['DATA_LOCATION_ACCESS'],
-            //principal: {
-              //dataLakePrincipalIdentifier: IAMUser.attrArn,
-            //},
-          //}],
           name: "database_cdk_test"
       }});
 
@@ -86,16 +78,9 @@ export class TaskStack extends Stack {
 
         //creating table
         const GlueTable = new glue.CfnTable(this, 'GlueTable', {
-          catalogId: '363434358349',
+          catalogId: Stack.of(this).account,
           databaseName: "database_cdk_test",
           tableInput: {
-              //owner: "hadoop",
-              //tableType: "EXTERNAL_TABLE",
-              //parameters: {
-                  //external: "TRUE",
-                  //has_encrypted_data: "false",
-                  //transient_lastDdlTime: "1656951835"
-              //},
               storageDescriptor: {
                   columns: [
                       {
@@ -144,18 +129,12 @@ export class TaskStack extends Stack {
                       }
                   ],
                   location: s3Bucket.bucketArn,
-                  //s3Bucket.bucketArn
-                  //"s3://taskstack-s3bucket07682993-1bat6tlfqn85w/folder_task3/"
                   inputFormat: "org.apache.hadoop.mapred.TextInputFormat",
                   outputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
                   compressed: false,
                   numberOfBuckets: -1,
                   serdeInfo: {
                       serializationLibrary: "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
-                      //parameters: {
-                          //field.delim: ",",
-                          //serialization.format: ","
-                      //}
                   },
                   storedAsSubDirectories: false
               },
@@ -171,10 +150,6 @@ export class TaskStack extends Stack {
           queryString: 'SELECT * FROM "database_cdk_test"."table_cdk_test" limit 3;',
           workGroup: 'AthenaWorkGroup45',
       });
-  }
- //Creating a bucket for access logs
-  private createServerAccessLogsBucket = (): IBucket => {
-    return new Bucket(this, 'ServerAccessLogsBucket');
   }
 }
 
