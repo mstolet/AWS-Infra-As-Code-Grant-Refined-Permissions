@@ -56,24 +56,38 @@ export class TaskStack extends Stack {
           name: "database_cdk_test"
       }});
 
-      //creating permission
       const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
         dataLakePrincipal: {
           dataLakePrincipalIdentifier: IAMUser.attrArn,
         },
         resource: {
+          databaseResource: {
+            catalogId: Stack.of(this).account,
+            name: "database_cdk_test",
+          },
+          dataLocationResource: {
+            catalogId: Stack.of(this).account,
+            s3Resource: `s3://${s3Bucket.bucketArn}/`,
+          },
+          tableResource: {
+            catalogId: Stack.of(this).account,
+            databaseName: 'databaseName',
+            name: 'name',
+            tableWildcard: { },
+          },
           tableWithColumnsResource: {
-            catalogId: '363434358349',
+            catalogId: Stack.of(this).account,
             columnNames: ['1','2','3','4','5','6','7','8','9','10','11'],
             columnWildcard: {
-              excludedColumnNames: ['5','6','7','8','9','10','11'],
-           },
-            databaseName: 'database_cdk_test',
-            //Refer to resource CfnDatabase
-            name: 'table_cdk_test',
+              excludedColumnNames: ['6','7','8','9','10','11'],
+            },
+            databaseName: "database_cdk_test",
+            name: 'name',
           },
         },
       });
+
+
 
         //creating table
         const GlueTable = new glue.CfnTable(this, 'GlueTable', {
