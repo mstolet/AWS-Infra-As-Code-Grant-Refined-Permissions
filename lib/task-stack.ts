@@ -109,16 +109,16 @@ export class TaskStack extends Stack {
                       }
                   ],
                   location: s3Bucket.bucketArn,
-                  inputFormat: "org.apache.hadoop.mapred.TextInputFormat",
+                  /*inputFormat: "org.apache.hadoop.mapred.TextInputFormat",
                   outputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
                   compressed: false,
                   numberOfBuckets: -1,
                   serdeInfo: {
                       serializationLibrary: "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
                   },
-                  storedAsSubDirectories: false
+                  storedAsSubDirectories: false*/
               },
-              retention: 0,
+              //retention: 0,
               name: "table_cdk_test"
               //Refer to resource
           }
