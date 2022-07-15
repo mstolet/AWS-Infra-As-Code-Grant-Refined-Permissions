@@ -39,10 +39,10 @@ export class TaskStack extends Stack {
           name: "AthenaWorkGroup45",
           state: "ENABLED",
           workGroupConfiguration: {
-              bytesScannedCutoffPerQuery: 1099511627776000,
-              enforceWorkGroupConfiguration: false,
-              publishCloudWatchMetricsEnabled: true,
-              requesterPaysEnabled: false,
+              //bytesScannedCutoffPerQuery: 1099511627776000,
+              //enforceWorkGroupConfiguration: false,
+              //publishCloudWatchMetricsEnabled: true,
+              //requesterPaysEnabled: false,
               resultConfiguration: {
                   outputLocation: `s3://${s3Bucket.bucketArn}/`
                }
