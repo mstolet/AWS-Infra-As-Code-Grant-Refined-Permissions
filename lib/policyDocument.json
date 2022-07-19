@@ -1,0 +1,41 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetDatabase",
+                "athena:GetWorkGroup",
+                "athena:StartQueryExecution",
+                "athena:GetQueryExecution",
+                "athena:GetQueryResults",
+                "glue:GetDatabases"
+            ],
+            "Resource": [
+                "arn:aws:athena:*:363434358349:workgroup/*",
+                "arn:aws:glue:*:363434358349:database/*",
+                "arn:aws:glue:*:363434358349:catalog"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetTables",
+                "glue:GetTable"
+            ],
+            "Resource": [
+                "arn:aws:glue:*:363434358349:database/database_datalake_task",
+                "arn:aws:glue:*:363434358349:catalog",
+                "arn:aws:glue:*:363434358349:table/database_datalake_task/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        }
+    ]
+}
