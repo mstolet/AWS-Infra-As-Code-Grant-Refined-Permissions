@@ -19,7 +19,7 @@ export class TaskStack extends Stack {
         });
     
         //create user
-        const IAMUser = new iam.CfnUser(this, 'IAMUserfix', {
+        /*const IAMUser = new iam.CfnUser(this, 'IAMUserfix', {
           loginProfile: {
             password: 'Senhamsb1*',
             passwordResetRequired: false,
@@ -32,20 +32,59 @@ export class TaskStack extends Stack {
               "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess",
               "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
           ]
-        });
+        });*/
 
-        /*const IAMUser = new iam.CfnUser(this, 'UserFix', {
+        const IAMUser = new iam.CfnUser(this, 'UserFix2', {
           loginProfile: {
             password: 'Senhamsb1*',
             passwordResetRequired: false,
           },
-          managedPolicyArns: ['managedPolicyArns'],
           policies: [{
-            policyDocument: policyDocument,
+            policyDocument: {
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Sid": "VisualEditor0",
+                      "Effect": "Allow",
+                      "Action": [
+                          "glue:GetDatabase",
+                          "athena:GetWorkGroup",
+                          "athena:StartQueryExecution",
+                          "athena:GetQueryExecution",
+                          "athena:GetQueryResults",
+                          "glue:GetDatabases"
+                      ],
+                      "Resource": [
+                          "arn:aws:athena:*:363434358349:workgroup/*",
+                          "arn:aws:glue:*:363434358349:database/*",
+                          "arn:aws:glue:*:363434358349:catalog"
+                      ]
+                  },
+                  {
+                      "Sid": "VisualEditor1",
+                      "Effect": "Allow",
+                      "Action": [
+                          "glue:GetTables",
+                          "glue:GetTable"
+                      ],
+                      "Resource": [
+                          "arn:aws:glue:*:363434358349:database/database_datalake_task",
+                          "arn:aws:glue:*:363434358349:catalog",
+                          "arn:aws:glue:*:363434358349:table/database_datalake_task/*"
+                      ]
+                  },
+                  {
+                      "Sid": "VisualEditor2",
+                      "Effect": "Allow",
+                      "Action": "s3:*",
+                      "Resource": "*"
+                  }
+              ]
+            },
             policyName: 'policyName',
           }],
-          userName: 'SensitiveFix',
-        });*/
+          userName: 'UserFix2',
+        });
 
         //Creating a bucket from faun
         const s3Bucket = new Bucket(this, 'S3Bucket', {
@@ -66,6 +105,7 @@ export class TaskStack extends Stack {
 
       //console.log(s3Bucket.bucketName)
 
+      //creating table
       const cfnTable = new glue.CfnTable(this, 'MyCfnTable', {
         catalogId: Stack.of(this).account,
         databaseName: "database_cdk_test",
@@ -144,7 +184,8 @@ export class TaskStack extends Stack {
           name: "database_cdk_test"
       }});
 
-      const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
+      //granting permissions
+      /*const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
         dataLakePrincipal: {
           dataLakePrincipalIdentifier: IAMUser.attrArn,
         },
@@ -159,13 +200,13 @@ export class TaskStack extends Stack {
           },
           tableResource: {
             catalogId: Stack.of(this).account,
-            databaseName: 'databaseName',
+            databaseName: 'database_cdk_test',
             name: 'name',
             tableWildcard: { },
           },
           tableWithColumnsResource: {
             catalogId: Stack.of(this).account,
-            columnNames: ['6','7','8','9','10','11'],
+            columnNames: ['1','2','3','4','5'],
             columnWildcard: {
               excludedColumnNames: ['6','7','8','9','10','11'],
             },
@@ -173,7 +214,7 @@ export class TaskStack extends Stack {
             name: 'name',
           },
         },
-      });
+      });*/
 
         //creating query
         const cfnNamedQuery = new athena.CfnNamedQuery(this, 'MyCfnNamedQuery', {
