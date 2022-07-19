@@ -19,21 +19,6 @@ export class TaskStack extends Stack {
         });
     
         //create user
-        /*const IAMUser = new iam.CfnUser(this, 'IAMUserfix', {
-          loginProfile: {
-            password: 'Senhamsb1*',
-            passwordResetRequired: false,
-          },
-          path: "/",
-          userName: "UserFix",
-          managedPolicyArns: [
-              "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-              "arn:aws:iam::aws:policy/AmazonAthenaFullAccess",
-              "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess",
-              "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
-          ]
-        });*/
-
         const IAMUser = new iam.CfnUser(this, 'UserFix2', {
           loginProfile: {
             password: 'Senhamsb1*',
@@ -52,6 +37,8 @@ export class TaskStack extends Stack {
                           "athena:StartQueryExecution",
                           "athena:GetQueryExecution",
                           "athena:GetQueryResults",
+                          "athena:UpdateWorkGroup",
+                          "athena:ListNamedQueries",
                           "glue:GetDatabases"
                       ],
                       "Resource": [
@@ -68,9 +55,9 @@ export class TaskStack extends Stack {
                           "glue:GetTable"
                       ],
                       "Resource": [
-                          "arn:aws:glue:*:363434358349:database/database_datalake_task",
+                          "arn:aws:glue:*:363434358349:database/database_cdk_test",
                           "arn:aws:glue:*:363434358349:catalog",
-                          "arn:aws:glue:*:363434358349:table/database_datalake_task/*"
+                          "arn:aws:glue:*:363434358349:table/*"
                       ]
                   },
                   {
@@ -80,7 +67,7 @@ export class TaskStack extends Stack {
                       "Resource": "*"
                   }
               ]
-            },
+          },
             policyName: 'policyName',
           }],
           userName: 'UserFix2',
