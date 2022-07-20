@@ -17,61 +17,7 @@ export class TaskStack extends Stack {
         const CodeCommitRepository = new codecommit.CfnRepository(this, 'Repo_task3', {
           repositoryName: "Repo_task3"
         });
-    
-        //create user
-        const IAMUser = new iam.CfnUser(this, 'UserFix2', {
-          loginProfile: {
-            password: 'Senhamsb1*',
-            passwordResetRequired: false,
-          },
-          policies: [{
-            policyDocument: {
-              "Version": "2012-10-17",
-              "Statement": [
-                  {
-                      "Sid": "VisualEditor0",
-                      "Effect": "Allow",
-                      "Action": [
-                          "glue:GetDatabase",
-                          "athena:GetWorkGroup",
-                          "athena:StartQueryExecution",
-                          "athena:GetQueryExecution",
-                          "athena:GetQueryResults",
-                          "athena:UpdateWorkGroup",
-                          "athena:ListNamedQueries",
-                          "glue:GetDatabases"
-                      ],
-                      "Resource": [
-                          "arn:aws:athena:*:363434358349:workgroup/*",
-                          "arn:aws:glue:*:363434358349:database/*",
-                          "arn:aws:glue:*:363434358349:catalog"
-                      ]
-                  },
-                  {
-                      "Sid": "VisualEditor1",
-                      "Effect": "Allow",
-                      "Action": [
-                          "glue:GetTables",
-                          "glue:GetTable"
-                      ],
-                      "Resource": [
-                          "arn:aws:glue:*:363434358349:database/database_cdk_test",
-                          "arn:aws:glue:*:363434358349:catalog",
-                          "arn:aws:glue:*:363434358349:table/*"
-                      ]
-                  },
-                  {
-                      "Sid": "VisualEditor2",
-                      "Effect": "Allow",
-                      "Action": "s3:*",
-                      "Resource": "*"
-                  }
-              ]
-          },
-            policyName: 'policyName',
-          }],
-          userName: 'UserFix2',
-        });
+  
 
         //Creating a bucket from faun
         const s3Bucket = new Bucket(this, 'S3Bucket', {
@@ -80,7 +26,7 @@ export class TaskStack extends Stack {
         });
         
         //Creates an Athena workgroup
-        const AthenaWorkGroup = new athena.CfnWorkGroup(this, 'AthenaWorkGroup', {
+        /*const WorkGroup = new athena.CfnWorkGroup(this, 'AthenaWorkGroup', {
           name: "AthenaWorkGroup45",
           state: "ENABLED",
           workGroupConfiguration: {
@@ -88,14 +34,35 @@ export class TaskStack extends Stack {
                   outputLocation: `s3://${s3Bucket.bucketName}/outputs/`
                }
           }
-      });
+      });*/
+
+      const WorkGroup = new athena.CfnWorkGroup(this, 'WorkGroup', {
+        name: "WorkGroupFix",
+        description: "",
+        state: "ENABLED",
+        workGroupConfiguration: {
+            enforceWorkGroupConfiguration: true,
+            publishCloudWatchMetricsEnabled: true,
+            requesterPaysEnabled: false,
+            resultConfiguration: {
+                outputLocation: `s3://${s3Bucket.bucketName}/outputs/`
+            }
+        }
+    });
 
       //console.log(s3Bucket.bucketName)
+
+      //creating database
+      const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
+        catalogId: Stack.of(this).account,
+        databaseInput: {
+          name: "database_cdk_test"
+      }});
 
       //creating table
       const cfnTable = new glue.CfnTable(this, 'MyCfnTable', {
         catalogId: Stack.of(this).account,
-        databaseName: "database_cdk_test",
+        databaseName: cfnDatabase.ref,
         tableInput: {
           name: 'name',
           owner: Stack.of(this).account,
@@ -163,23 +130,70 @@ export class TaskStack extends Stack {
           //retention: 0,
         }});
 
-
-      //creating database
-      const cfnDatabase = new glue.CfnDatabase(this, 'MyCfnDatabase', {
-        catalogId: Stack.of(this).account,
-        databaseInput: {
-          name: "database_cdk_test"
-      }});
+        //create user
+        const IAMUser = new iam.CfnUser(this, 'UserFix2', {
+          loginProfile: {
+            password: 'Senhamsb1*',
+            passwordResetRequired: false,
+          },
+          policies: [{
+            policyDocument: {
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Sid": "VisualEditor0",
+                      "Effect": "Allow",
+                      "Action": [
+                          "glue:GetDatabase",
+                          "athena:GetWorkGroup",
+                          "athena:StartQueryExecution",
+                          "athena:GetQueryExecution",
+                          "athena:GetQueryResults",
+                          "athena:UpdateWorkGroup",
+                          "athena:ListNamedQueries",
+                          "glue:GetDatabases"
+                      ],
+                      "Resource": [
+                          "arn:aws:athena:*:363434358349:workgroup/*",
+                          cfnDatabase.getAtt('arn'),
+                          "arn:aws:glue:*:363434358349:catalog"
+                      ]
+                  },
+                  {
+                      "Sid": "VisualEditor1",
+                      "Effect": "Allow",
+                      "Action": [
+                          "glue:GetTables",
+                          "glue:GetTable"
+                      ],
+                      "Resource": [
+                          "arn:aws:glue:*:363434358349:database/database_cdk_test",
+                          "arn:aws:glue:*:363434358349:catalog",
+                          "arn:aws:glue:*:363434358349:table/*"
+                      ]
+                  },
+                  {
+                      "Sid": "VisualEditor2",
+                      "Effect": "Allow",
+                      "Action": "s3:*",
+                      "Resource": "*"
+                  }
+              ]
+          },
+            policyName: 'policyName',
+          }],
+          userName: 'UserFix2',
+        });
 
       //granting permissions
-      /*const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
+      const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
         dataLakePrincipal: {
           dataLakePrincipalIdentifier: IAMUser.attrArn,
         },
         resource: {
           databaseResource: {
             catalogId: Stack.of(this).account,
-            name: "database_cdk_test",
+            name: cfnDatabase.ref,
           },
           dataLocationResource: {
             catalogId: Stack.of(this).account,
@@ -187,7 +201,7 @@ export class TaskStack extends Stack {
           },
           tableResource: {
             catalogId: Stack.of(this).account,
-            databaseName: 'database_cdk_test',
+            databaseName: cfnDatabase.ref,
             name: 'name',
             tableWildcard: { },
           },
@@ -197,17 +211,17 @@ export class TaskStack extends Stack {
             columnWildcard: {
               excludedColumnNames: ['6','7','8','9','10','11'],
             },
-            databaseName: "database_cdk_test",
+            databaseName: cfnDatabase.ref,
             name: 'name',
           },
         },
-      });*/
+      });
 
         //creating query
         const cfnNamedQuery = new athena.CfnNamedQuery(this, 'MyCfnNamedQuery', {
-          database: 'database_cdk_test',
+          database: cfnDatabase.ref,
           queryString: 'SELECT * FROM "database_cdk_test"."table_cdk_test" limit 3;',
-          workGroup: 'AthenaWorkGroup45',
+          workGroup: WorkGroup.ref,
       });
   }
 }
