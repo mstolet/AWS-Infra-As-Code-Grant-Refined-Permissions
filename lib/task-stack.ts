@@ -7,8 +7,6 @@ import { aws_lakeformation as lakeformation } from 'aws-cdk-lib';
 import { Bucket, BucketEncryption, BucketPolicy, IBucket } from "aws-cdk-lib/aws-s3";
 import { aws_glue as glue } from 'aws-cdk-lib';
 
-declare const policyDocument: any;
-
 export class TaskStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -141,11 +139,20 @@ export class TaskStack extends Stack {
               "Version": "2012-10-17",
               "Statement": [
                   {
+                      "Sid": "WorkgroupAccess",
+                      "Effect": "Allow",
+                      "Action": [
+                          "athena:GetWorkGroup",
+                          "athena:ListWorkGroups"
+                      ],
+                      "Resource": [
+                        `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`
+                      ]
+                  },{
                       "Sid": "VisualEditor0",
                       "Effect": "Allow",
                       "Action": [
                           "glue:GetDatabase",
-                          "athena:GetWorkGroup",
                           "athena:StartQueryExecution",
                           "athena:GetQueryExecution",
                           "athena:GetQueryResults",
@@ -154,9 +161,7 @@ export class TaskStack extends Stack {
                           "glue:GetDatabases"
                       ],
                       "Resource": [
-                          "arn:aws:athena:*:363434358349:workgroup/*",
-                          cfnDatabase.getAtt('arn'),
-                          "arn:aws:glue:*:363434358349:catalog"
+                        "*"
                       ]
                   },
                   {
