@@ -23,17 +23,6 @@ export class TaskStack extends Stack {
           versioned: true,
         });
         
-        //Creates an Athena workgroup
-        /*const WorkGroup = new athena.CfnWorkGroup(this, 'AthenaWorkGroup', {
-          name: "AthenaWorkGroup45",
-          state: "ENABLED",
-          workGroupConfiguration: {
-              resultConfiguration: {
-                  outputLocation: `s3://${s3Bucket.bucketName}/outputs/`
-               }
-          }
-      });*/
-
       const WorkGroup = new athena.CfnWorkGroup(this, 'WorkGroup', {
         name: "WorkGroupFix",
         description: "",
@@ -128,6 +117,13 @@ export class TaskStack extends Stack {
           //retention: 0,
         }});
 
+        //creating query
+        const cfnNamedQuery = new athena.CfnNamedQuery(this, 'MyCfnNamedQuery', {
+          database: cfnDatabase.ref,
+          queryString: `SELECT * FROM ${cfnDatabase.ref}.${cfnTable.ref} limit 3;`,
+          workGroup: WorkGroup.ref,
+      });
+
         //create user
         const IAMUser = new iam.CfnUser(this, 'UserFix2', {
           loginProfile: {
@@ -135,50 +131,48 @@ export class TaskStack extends Stack {
             passwordResetRequired: false,
           },
           policies: [{
-            policyDocument: {
+            policyDocument: 
+            {
               "Version": "2012-10-17",
               "Statement": [
                   {
-                      "Sid": "WorkgroupAccess",
+                      "Sid": "Athena",
                       "Effect": "Allow",
                       "Action": [
                           "athena:GetWorkGroup",
-                          "athena:ListWorkGroups"
-                      ],
-                      "Resource": [
-                        `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`
-                      ]
-                  },{
-                      "Sid": "VisualEditor0",
-                      "Effect": "Allow",
-                      "Action": [
-                          "glue:GetDatabase",
+                          "athena:ListWorkGroups",
                           "athena:StartQueryExecution",
                           "athena:GetQueryExecution",
                           "athena:GetQueryResults",
-                          "athena:UpdateWorkGroup",
                           "athena:ListNamedQueries",
-                          "glue:GetDatabases"
-                      ],
+                          "athena:GetNamedQuery",
+                          "athena:BatchGetNamedQuery",
+                        ],
                       "Resource": [
-                        "*"
+                          `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`,
+                          `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}/${cfnNamedQuery.ref}`,
+                          `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
+                          "arn:aws:glue:*:*:catalog"
                       ]
                   },
                   {
-                      "Sid": "VisualEditor1",
+                      "Sid": "Glue",
                       "Effect": "Allow",
                       "Action": [
                           "glue:GetTables",
-                          "glue:GetTable"
+                          "glue:GetTable",
+                          "glue:GetDatabases",
+                          "glue:ListDatabases",
+                          "glue:GetDatabase",
                       ],
                       "Resource": [
-                          "arn:aws:glue:*:363434358349:database/database_cdk_test",
-                          "arn:aws:glue:*:363434358349:catalog",
-                          "arn:aws:glue:*:363434358349:table/*"
+                          `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
+                          `arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
+                          "arn:aws:glue:*:*:catalog",
                       ]
                   },
                   {
-                      "Sid": "VisualEditor2",
+                      "Sid": "S3",
                       "Effect": "Allow",
                       "Action": "s3:*",
                       "Resource": "*"
@@ -212,7 +206,7 @@ export class TaskStack extends Stack {
           },
           tableWithColumnsResource: {
             catalogId: Stack.of(this).account,
-            columnNames: ['1','2','3','4','5'],
+            columnNames: ['1','2','3','4','5','6','7','8','9','10','11'],
             columnWildcard: {
               excludedColumnNames: ['6','7','8','9','10','11'],
             },
@@ -220,13 +214,6 @@ export class TaskStack extends Stack {
             name: 'name',
           },
         },
-      });
-
-        //creating query
-        const cfnNamedQuery = new athena.CfnNamedQuery(this, 'MyCfnNamedQuery', {
-          database: cfnDatabase.ref,
-          queryString: 'SELECT * FROM "database_cdk_test"."table_cdk_test" limit 3;',
-          workGroup: WorkGroup.ref,
       });
   }
 }
