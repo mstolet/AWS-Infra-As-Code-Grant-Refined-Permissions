@@ -135,7 +135,7 @@ export class TaskStack extends Stack {
             {
               "Version": "2012-10-17",
               "Statement": [
-                  {
+                  /*{
                       "Sid": "Athena",
                       "Effect": "Allow",
                       "Action": [
@@ -147,11 +147,22 @@ export class TaskStack extends Stack {
                           "athena:ListNamedQueries",
                           "athena:GetNamedQuery",
                           "athena:BatchGetNamedQuery",
+                          "glue:GetTables",
+                          "glue:GetTable",
+                          "glue:GetDatabases",
+                          "glue:ListDatabases",
+                          "glue:GetDatabase",
                         ],
                       "Resource": [
-                          `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`,
+                          /*`arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`,
                           `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}/${cfnNamedQuery.ref}`,
                           `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
+                          "arn:aws:glue:*:*:catalog"
+                          //"*"
+                          `arn:aws:athena:*:*:workgroup/WorkGroupFix`,
+                          `arn:aws:athena:*:*:workgroup/WorkGroupFix/${cfnNamedQuery.ref}`,
+                          `arn:aws:glue:*:*:database/database_cdk_test`,
+                          `arn:aws:glue:*:*:table/database_cdk_test/name`,
                           "arn:aws:glue:*:*:catalog"
                       ]
                   },
@@ -166,11 +177,52 @@ export class TaskStack extends Stack {
                           "glue:GetDatabase",
                       ],
                       "Resource": [
-                          `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
+                          /*`arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
                           `arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
                           "arn:aws:glue:*:*:catalog",
+                          //"*"
+                          `arn:aws:glue:*:*:database/database_cdk_test`,
+                          `arn:aws:glue:*:*:table/database_cdk_test/name`,
+                          `arn:aws:athena:*:*:workgroup/WorkGroupFix`,
+                          `arn:aws:athena:*:*:workgroup/WorkGroupFix/${cfnNamedQuery.ref}`,
+                          "arn:aws:glue:*:*:catalog"
                       ]
-                  },
+                  },*/
+                  {
+                    "Sid": "VisualEditor0",
+                    "Effect": "Allow",
+                    "Action": [
+                        "athena:GetWorkGroup",
+                        "athena:StartQueryExecution",
+                        "athena:GetQueryExecution",
+                        "athena:GetQueryResults",
+                        "glue:GetDatabases",
+                        "glue:GetDatabase",
+
+                        "athena:ListWorkGroups",
+                        "athena:UpdateWorkGroup"
+
+                    ],
+                    "Resource": [
+                        "arn:aws:glue:*:*:catalog",
+                        "arn:aws:glue:*:*:database/*",
+                        "arn:aws:athena:*:*:workgroup/*"
+                    ]
+                },
+                {
+                    "Sid": "VisualEditor1",
+                    "Effect": "Allow",
+                    "Action": [
+                        "glue:GetTables",
+                        "glue:GetTable"
+                    ],
+                    "Resource": [
+                        "arn:aws:glue:*:*:catalog",
+                        "arn:aws:glue:*:*:database/*",
+                        "arn:aws:athena:*:*:workgroup/*",
+                        "arn:aws:glue:*:*:table/*"
+                    ]
+                },
                   {
                       "Sid": "S3",
                       "Effect": "Allow",
