@@ -24,12 +24,8 @@ export class TaskStack extends Stack {
 
         const WorkGroup = new athena.CfnWorkGroup(this, 'WorkGroup', {
           name: "WorkGroups",
-          //description: "",
           state: "ENABLED",
           workGroupConfiguration: {
-              //enforceWorkGroupConfiguration: true,
-              //publishCloudWatchMetricsEnabled: true,
-              //requesterPaysEnabled: false,
               resultConfiguration: {
                   outputLocation: `s3://${s3Bucket.bucketName}/outputs/`
               }
@@ -113,7 +109,6 @@ export class TaskStack extends Stack {
               compressed: false,
               location: `s3://${s3Bucket.bucketName}/folder_task3/`,         
             },
-            //retention: 0,
           }});
 
           //creating query
@@ -150,7 +145,7 @@ export class TaskStack extends Stack {
                         ],
                         "Resource": [
                           `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`,
-                          `arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
+                          //`arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
                           `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
                           `arn:aws:glue:*:*:catalog`
                         ]
@@ -159,14 +154,14 @@ export class TaskStack extends Stack {
                         "Sid": "gluepolicies",
                         "Effect": "Allow",
                         "Action": [
-                            "glue:GetTables",
-                            "glue:GetTable",
+                            //"glue:GetTables",
+                            //"glue:GetTable",
                             "glue:GetDatabases",
                             "glue:GetDatabase"
                         ],
                         "Resource": [
                           `arn:aws:athena:*:*:workgroup/${WorkGroup.ref}`,
-                          `arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
+                          //`arn:aws:glue:*:*:table/${cfnDatabase.ref}/${cfnTable.ref}`,
                           `arn:aws:glue:*:*:database/${cfnDatabase.ref}`,
                           `arn:aws:glue:*:*:catalog`
                         ]
@@ -175,7 +170,11 @@ export class TaskStack extends Stack {
                         "Sid": "s3policies",
                         "Effect": "Allow",
                         "Action": "s3:*",
-                        "Resource": "*"
+                        "Resource": /*[
+                          "arn:aws:s3:::${s3Bucket.ref}",
+                          "arn:aws:s3:::${s3Bucket.ref}/*"
+                        ]*/
+                        "*"
                     }
                 ]
             },
@@ -185,12 +184,12 @@ export class TaskStack extends Stack {
           });
       
           //granting permissions
-          const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
+          /*const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
             dataLakePrincipal: {
               dataLakePrincipalIdentifier: IAMUser.attrArn,
             },
             resource: {
-              databaseResource: {
+              /*databaseResource: {
                 catalogId: Stack.of(this).account,
                 name: cfnDatabase.ref,
               },
@@ -202,21 +201,39 @@ export class TaskStack extends Stack {
                 catalogId: Stack.of(this).account,
                 databaseName: cfnDatabase.ref,
                 name: cfnTable.ref,
-                //'namei',
-                tableWildcard: { },
+                tableWildcard: { excludedColumnNames: ['1','2','3','4','5'] },
               },
-              tableWithColumnsResource: {
+              /*tableWithColumnsResource: {
                 catalogId: Stack.of(this).account,
                 columnNames: ['1','2','3','4','5','6','7','8','9','10','11'],
                 columnWildcard: {
-                  excludedColumnNames: ['6','7','8','9','10','11'],
+                  excludedColumnNames: ['1','2','3','4','5'],
                 },
                 databaseName: cfnDatabase.ref,
                 name: cfnTable.ref
-                //'namei',
               },
             },
+          });*/
+
+          //creating permission
+          /*const cfnPermissions = new lakeformation.CfnPermissions(this, 'MyCfnPermissions', {
+            dataLakePrincipal: {
+                dataLakePrincipalIdentifier: IAMUser.attrArn,
+            },
+            resource: {
+                tableWithColumnsResource: {
+                    catalogId: Stack.of(this).account,
+                    columnNames: ['1','2','3','4','5','6','7','8','9','10','11'],
+                    //table.columns.map(col => col.name),
+                    columnWildcard: {
+                        excludedColumnNames: ['1','2','3','4','5'],
+                    },
+                    databaseName: cfnDatabase.ref,
+                    name: cfnTable.ref
+                },
+            },
           });
+          cfnPermissions.addDependsOn(cfnDatabase);*/
 
   }
 }
