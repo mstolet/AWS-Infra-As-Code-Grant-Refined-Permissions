@@ -1,8 +1,7 @@
-# Welcome to your CDK TypeScript project
+# AWS IAM Grant Refined Permissions using LakeFormation Via CDK (Infra as code tool) project
 
-This is a blank project for CDK development with TypeScript.
-
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+# Description
+This project uses Cloud Development Kit, a AWS tool for infrastructure as code, to create a AWS IAM user with refined LakeFormation permissions so only some of the columns in a data base is displayed for it when a query is made in AWS Athena, for example. This is usefull when you have sensitive information among your data that your user cannot see.
 
 ## Useful commands
 
